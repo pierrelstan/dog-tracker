@@ -5,7 +5,6 @@ export type StatusFilter = "all" | "moving" | "idle" | "low_battery" | "offline"
 
 type UIState = {
   status: StatusFilter;
-  // Lookback window in minutes for KPIs/charts (applies to local histories)
   lookbackMinutes: number;
 };
 

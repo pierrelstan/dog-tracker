@@ -7,10 +7,10 @@ export type Dog = {
   name: string;
   lat: number;
   lng: number;
-  speed: number;     // km/h
-  heading: number;   // degrees
+  speed: number;    
+  heading: number;   
   status: DogStatus;
-  battery?: number;  // %
+  battery?: number; 
   updatedAt: number;
 };
 
@@ -27,9 +27,8 @@ type DogsState = {
   items: Record<string, Dog>;
   order: string[];
   selectedId: string | null;
-  // Rolling history per dog for lookback analytics
+
   history: Record<string, HistoryPoint[]>;
-  // Event feed
   alerts: { id: string; dogId: string; type: string; message: string; t: number }[];
 };
 
@@ -41,8 +40,8 @@ const initialState: DogsState = {
   alerts: []
 };
 
-const MAX_POINTS = 60 * 5; // keep ~5 minutes at 1 update/second; safe for 500ms too
-const SPEED_ALERT = 20; // km/h
+const MAX_POINTS = 60 * 5;
+const SPEED_ALERT = 20;
 const LOW_BATT = 10;
 
 function pushHistory(state: DogsState, d: Dog) {
@@ -54,7 +53,7 @@ function pushHistory(state: DogsState, d: Dog) {
 
 function addAlert(state: DogsState, dogId: string, type: string, message: string, t: number) {
   state.alerts.unshift({ id: `${dogId}-${t}-${type}`, dogId, type, message, t });
-  // cap alerts list
+ 
   if (state.alerts.length > 200) state.alerts.splice(200);
 }
 
