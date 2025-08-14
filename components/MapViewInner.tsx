@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import type { Icon } from "leaflet";
+import { divIcon, type Icon } from "leaflet";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { selectDog } from "@/store/dogsSlice";
@@ -12,37 +12,35 @@ import { selectFilteredIds } from "@/lib/selectors";
 import { FaDog as DogIcon } from "react-icons/fa6";
 import ReactDOMServer from "react-dom/server";
 
-/** Tailwind-like color hex codes */
+/** Tailwind class names for marker colors */
 const STATUS_COLOR = {
-  moving: "#16a34a",
-  idle: "#6b7280",
-  low_battery: "#ca8a04",
-  offline: "#dc2626",
+  moving: "bg-green-400",
+  idle: "bg-gray-400",
+  low_battery: "bg-yellow-400",
+  offline: "bg-red-400",
 } as const;
 
 /** Cache Leaflet Icons per status so we don't rebuild every render */
 type Status = "moving" | "idle" | "low_battery" | "offline";
 
-function svgToDataUrl(svg: string) {
-  // Ensure minimal XML header for better rendering in some browsers
-  const svgWithHeader = svg.startsWith("<?xml")
-    ? svg
-    : `<?xml version="1.0" encoding="UTF-8"?>${svg}`;
-  return `data:image/svg+xml;base64,${btoa(svgWithHeader)}`;
-}
-
-function makeLucideDogDataUrl(color: string, size = 36) {
-  const svg = ReactDOMServer.renderToString(
-    // stroke only; you can add fill="currentColor" if you prefer solid
-    <DogIcon width={size} height={size} color={color} strokeWidth={2.2} />
-  );
-  return svgToDataUrl(svg);
-}
-
 export default function MapViewInner() {
   const items = useSelector((s: RootState) => s.dogs.items);
   const orderFiltered = useSelector(selectFilteredIds);
   const dispatch = useDispatch();
+
+  function makeLucideDogDataUrl(color: string) {
+    console.log(color);
+    return divIcon({
+      html: `
+        <div class="relative">
+          <div class="w-6 h-6 rounded-full shadow-lg border-2  ${color} flex items-center justify-center">
+            <div class="w-3 h-3 rounded-full border-2  ${color}"></div>
+          </div>
+          <div class="absolute inset-0 w-6 h-6 rounded-full ${color} animate-ping opacity-75"></div>
+        </div>
+      `,
+    });
+  }
 
   const center = useMemo<[number, number]>(() => {
     const firstId = orderFiltered[0];
@@ -65,32 +63,24 @@ export default function MapViewInner() {
   }, []);
 
   // Memoized icon cache
-  const iconCache = useRef<Record<Status, Icon | null>>({
+  // Memoized icon cache
+  const iconCache = useRef<Record<Status, any>>({
     moving: null,
     idle: null,
     low_battery: null,
     offline: null,
   });
 
-  function getIcon(status: Status): Icon | null {
+  function getIcon(status: Status): any {
     if (!Lmod) return null;
     if (iconCache.current[status]) return iconCache.current[status];
 
-    const color = STATUS_COLOR[status];
-    const url = makeLucideDogDataUrl(color, 36);
-
-    const icon = new Lmod.Icon({
-      iconUrl: url,
-      iconSize: [36, 36],
-      iconAnchor: [18, 34], // bottom-center-ish
-      popupAnchor: [0, -32],
-      shadowUrl: undefined,
-    });
+    const colorClass = STATUS_COLOR[status];
+    const icon = makeLucideDogDataUrl(colorClass);
 
     iconCache.current[status] = icon;
     return icon;
   }
-
   return (
     <MapContainer
       center={center}

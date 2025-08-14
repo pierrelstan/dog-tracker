@@ -1,70 +1,79 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import { selectDog } from "@/store/dogsSlice";
+import { selectDog, type Dog } from "@/store/dogsSlice";
 
 function DogList() {
-  const dogs = useSelector((s: RootState) => Object.values(s.dogs.items));
+  const dogs = useSelector((s: RootState) =>
+    Object.values(s.dogs.items)
+  ) as Dog[];
+  console.log(dogs);
   const selectedId = useSelector((s: RootState) => s.dogs.selectedId);
-
   const dispatch = useDispatch();
+
+  if (!dogs || dogs.length === 0) {
+    return <div className="p-4 text-slate-400 text-center">No dogs found.</div>;
+  }
+
   return (
-    <ul className="space-y-4" data-testid="dog-list">
-      {dogs.map((dog: any) => (
-        <li key={dog.id}>
-          <button
-            onClick={() => dispatch(selectDog(dog.id))}
-            className={`flex items-center gap-4 p-3 rounded-xl w-full text-left transition ${
-              selectedId?.includes(dog.id)
-                ? "bg-blue-900/40 ring-"
-                : "bg-[#23272f] hover:bg-[#23272f]/80"
-            }`}
-          >
-            <DogAvatar name={dog.name} status={dog.status} />
-            <div>
-              <div className="font-semibold text-white text-lg">{dog.name}</div>
-              <div className="text-xs text-gray-400 capitalize flex items-center gap-2">
-                <span
-                  className={`inline-block w-2 h-2 rounded-full ${
+    <div className="p-4 space-y-3 h-full overflow-y-auto">
+      {dogs.map((dog) => (
+        <div
+          key={dog.id}
+          className={`bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-4 hover:border-slate-600/50 transition-all duration-300  cursor-pointer ${
+            selectedId?.includes(dog.id) ? "bg-slate-100/50" : "bg-sky-900/50"
+          }`}
+        >
+          <div onClick={() => dispatch(selectDog(dog.id))}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-3 h-3 rounded-full ${
                     dog.status === "moving"
-                      ? "bg-green-500"
+                      ? "bg-green-400 animate-pulse"
                       : dog.status === "idle"
-                      ? "bg-gray-400"
+                      ? "bg-gray-400 animate-pulse"
                       : dog.status === "low_battery"
-                      ? "bg-yellow-500"
+                      ? "bg-yellow-400"
                       : dog.status === "offline"
-                      ? "bg-red-500"
+                      ? "bg-red-400 animate-pulse"
                       : "bg-gray-300"
                   }`}
-                ></span>
-                {dog.status.replace("_", " ")}
+                />
+                <div>
+                  <div className="font-semibold text-white text-sm">
+                    {dog.name || "Unknown"}
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-medium text-white">
+                  {dog.speed.toFixed(2) ?? 0} km/h
+                </div>
               </div>
             </div>
-          </button>
-        </li>
+            <div
+              className={`text-xs px-2 py-1 rounded-full inline-block ${
+                dog.status === "moving"
+                  ? "bg-green-400 animate-pulse"
+                  : dog.status === "idle"
+                  ? "bg-gray-400 animate-pulse"
+                  : dog.status === "low_battery"
+                  ? "bg-yellow-400"
+                  : dog.status === "offline"
+                  ? "bg-red-400 animate-pulse"
+                  : "bg-gray-300"
+              }`}
+            >
+              {dog.status
+                ? dog.status.charAt(0).toUpperCase() + dog.status.slice(1)
+                : "Unknown"}
+            </div>
+          </div>
+        </div>
       ))}
-    </ul>
-  );
-}
-
-function DogAvatar({ name, status }: { name: string; status: string }) {
-  const statusColor =
-    {
-      moving: "bg-green-500",
-      idle: "bg-gray-400",
-      low_battery: "bg-yellow-500",
-      offline: "bg-red-500",
-    }[status] || "bg-gray-300";
-  return (
-    <div
-      className={`relative w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold text-white ${statusColor} shadow-lg`}
-    >
-      {name.charAt(0)}
-      <span
-        className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#181a2a] ${statusColor}`}
-      ></span>
     </div>
   );
 }
+
 export default DogList;
