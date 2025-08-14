@@ -36,5 +36,6 @@
     "socket.io-client": "^4.7.5",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "license": "MIT"
 }
