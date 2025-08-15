@@ -8,6 +8,7 @@ import DistanceBarChart from "@/components/DistanceBarChart";
 import ActivityPieChart from "@/components/ActivityPieChart";
 import SpeedChart from "@/components/SpeedChart";
 import Controls from "@/components/Controls";
+import AlertsClearButton from "@/components/AlertsClearButton";
 
 export default function Page() {
   return (
@@ -47,7 +48,7 @@ export default function Page() {
           {/* KPI and Controls Section */}
           <section className="px-6 mb-12">
             <div className="max-w-7xl mx-auto space-y-8">
-              <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-3xl p-8 shadow-2xl">
+                  <div className="bg-slate-900/90 border border-slate-800/50 rounded-3xl p-8 shadow-2xl">
                 <KpiBar />
               </div>
 
@@ -63,7 +64,7 @@ export default function Page() {
               <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
                 {/* Map View - Takes up most space */}
                 <div className="xl:col-span-7">
-                  <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-3xl overflow-hidden shadow-2xl h-[500px]">
+                    <div className="bg-slate-900/90 border border-slate-800/50 rounded-3xl overflow-hidden shadow-2xl h-[500px]">
                     <div className="h-full relative">
                       <div className="absolute top-6 left-6 z-10">
                         <h2 className="text-xl font-semibold text-white mb-1">
@@ -112,7 +113,11 @@ export default function Page() {
                             Recent system events
                           </p>
                         </div>
-                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-lg shadow-amber-400/50" />
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-lg shadow-amber-400/50" />
+                          {/* Clear Alerts Button */}
+                          <AlertsClearButton />
+                        </div>
                       </div>
                     </div>
                     <div className="h-[200px] overflow-hidden">
